@@ -12,7 +12,7 @@ services:
     ports:
       - ${UI_PORT}:9292/tcp
     networks:
-      - reddit_front
+      - reddit
   post:
     build: ./post-py
     image: ${USERNAME}/post:${POST}
@@ -28,3 +28,6 @@ services:
 
 volumes:
   post_db:
+
+networks:
+  reddit:
