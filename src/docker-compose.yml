@@ -17,14 +17,12 @@ services:
     build: ./post-py
     image: ${USERNAME}/post:${POST}
     networks:
-      - reddit_front
-      - reddit_back
+      - reddit
   comment:
     build: ./comment
     image: ${USERNAME}/comment:${COMMENT}
     networks:
-      - reddit_front
-      - reddit_back
+      - reddit
 
 volumes:
   post_db:
