@@ -1,36 +1,32 @@
 version: '3.3'
 services:
   post_db:
-    image: mongo:${POST_DB}
+    image: mongo:3.2
     volumes:
       - post_db:/data/db
     networks:
-      - back_net
-
+      - back-network
   ui:
     build: ./ui
-    image: ${USERNAME}/ui:${UI}
+    image: ${USERNAME}/${UI_VERSION}
     ports:
-      - ${UI_PORT}:9292/tcp
+      - ${UI_PORT}
     networks:
-      - front_net
-
+      - front-network
   post:
     build: ./post-py
-    image: ${USERNAME}/post:${POST}
+    image: ${USERNAME}/post:2.0
     networks:
-      - front_net
-      - back_net
-
+      - back-network
+      - front-network
   comment:
     build: ./comment
-    image: ${USERNAME}/comment:${COMMENT}
+    image: ${USERNAME}/comment:1.0
     networks:
-      - front_net
-      - back_net
-
+      - back-network
+      - front-network
   prometheus:
-    image: ${USERNAME}/prometheus
+    image: kirillkotovsky/prometheus
     ports:
       - '9090:9090'
     volumes:
@@ -40,9 +36,8 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention=1d' # Задаем время хранения метрик в 1 день
     networks:
-      - front_net
-      - back_net
-
+      - back-network
+      - front-network
   node-exporter:
     image: prom/node-exporter:v1.1.2
     user: root
@@ -55,12 +50,20 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
     networks:
-      - back_net
-
+      - back-network
+      - front-network
 volumes:
   post_db:
   prometheus_data:
 
 networks:
-  front_net:
-  back_net:
+  back-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24
+  front-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
